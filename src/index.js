@@ -2,11 +2,17 @@ const express = require('express')
 // const bodyParser = require('body-parser')
 const serverConfig = require('./Config/serverConfig');
 const connectDB = require('./Config/dbConfig');
+const userRouter = require('./routes/userRoute');
+const cartRouter = require('./routes/cartRoute');
 // const User = require('./schema/userSchema')
 const app = express();
 app.use(express.json({extended : true}))
 app.use(express.text({extended : true}))
 app.use(express.urlencoded({extended : true}))
+
+app.use('/users',userRouter)
+app.use('/carts',cartRouter)
+
 
 app.post("/ping",(req,res)=>{
     console.log(req.body)
