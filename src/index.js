@@ -1,34 +1,45 @@
-const express = require('express')
-// const bodyParser = require('body-parser')
-const serverConfig = require('./Config/serverConfig');
-const connectDB = require('./Config/dbConfig');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+
+const ServerConfig = require('./config/serverConfig');
+const connectDB = require('./config/dbConfig');
 const userRouter = require('./routes/userRoute');
 const cartRouter = require('./routes/cartRoute');
-// const User = require('./schema/userSchema')
+const authRouter = require('./routes/authRoute');
+const productRouter = require('./routes/productRoute');
+const orderRouter = require('./routes/orderRoutes');
+// const User = require('./schema/userSchema');
+
 const app = express();
-app.use(express.json({extended : true}))
-app.use(express.text({extended : true}))
-app.use(express.urlencoded({extended : true}))
 
-app.use('/users',userRouter)
-app.use('/carts',cartRouter)
+app.use(cors({
+    origin: ServerConfig.FRONTEND_URL, // allow to server to accept request from different origin
+    credentials: true, // allow session cookie from browser to pass through
+}));
 
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.text());
+app.use(express.urlencoded({ extended: true }));
 
-app.post("/ping",(req,res)=>{
-    console.log(req.body)
-    return res.json({message : "pong"})
-})
+// Routing middleware
+// if your req route starts with /users then handle it using userRouter
+app.use('/users', userRouter); // connects the router to the server
+app.use('/carts', cartRouter);
+app.use('/auth', authRouter);
+app.use('/products', productRouter);
+app.use('/orders', orderRouter);
+app.get('/ping', (req, res) => {
+    // controller
+    console.log(req.body);
+    console.log(req.cookies);
+    return res.json({message: "pong"});
+});
 
-app.listen(serverConfig.port, async () => {
+app.listen(ServerConfig.PORT, async () => {
     await connectDB();
-    console.log(`server started at ${serverConfig.port} port `)
-//    const newUser = await User.create({
-//      firstName: "chirag",
-//      lastName: "sharma",
-//      mobileNumber: "7737003298",
-//      email: 'ab@gmail.com',
-//      password: "12345678"
-//    })
-//    console.log("value updated")
-//    console.log(newUser) 
-})
+    console.log(`Server started at port ${ServerConfig.PORT}...!!`);
+
+    
+});
